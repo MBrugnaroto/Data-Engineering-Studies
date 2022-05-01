@@ -1,0 +1,2 @@
+echo Numero de Processos Ativos:
+ps -e | wc -l 
