@@ -1,1 +1,1 @@
-# shell-scripting-exercises
+# Shell Scripting Exercises
