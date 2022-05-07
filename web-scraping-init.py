@@ -3,4 +3,4 @@ def main(word: str) -> None:
 
 
 if __name__ == '__main__':
-    main("Teste")
+    main(1)
