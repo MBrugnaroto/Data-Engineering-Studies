@@ -9,6 +9,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+.pre-commit-config.yaml
+tox.ini
+web-scraping-env
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
