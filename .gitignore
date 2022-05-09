@@ -6,9 +6,6 @@
 !.vscode/*.code-snippets
 web-scraping-env
 .pre-commit-config.yaml
-
-# Local History for Visual Studio Code
+*.json
 .history/
-
-# Built Visual Studio Code Extensions
 *.vsix
