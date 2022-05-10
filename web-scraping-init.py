@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as Soup
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 from typing import Dict, List
+from urllib.request import urlretrieve
 
 
 DictType = Dict[str, str]
@@ -38,20 +39,27 @@ def getFirstTagAttr(html: Soup, tag: str) -> DictType:
     return html.find(tag).attrs
 
 
-def getAllOcurrOfTheTag(html: Soup, tag: str, attrs: DictType) -> List[str]:
+def getAllOcurrOfTheTag(html: Soup, tag: str, attrs: DictType) -> List[Soup]:
     return html.findAll(tag, attrs=attrs)
 
 
 def getInfosFromDiv(html: Soup, attrs: DictType) -> None:
     for tag in getAllOcurrOfTheTag(html, 'div', attrs):
         car_infos: DictType = {}
-        all_tags: List[Soup] = tag.findAll('p', text=True)
+        p_tags: List[Soup] = tag.findAll('p', text=True)
 
-        for p_tag in all_tags:
-            tag_name = p_tag.get('class')[0]
+        for p_tag in p_tags:
+            tag_name = p_tag.get('class')[0].split('-')[-1]
             car_infos[tag_name] = p_tag.get_text()
 
-        car_infos['URL'] = tag.find('img').get('src')
+        ul_tag: List[Soup] = [value.get_text().replace('► ', '') for
+                              value in tag.find('ul').findAll('li')]
+        ul_tag.pop()
+        car_infos['items'] = ul_tag
+
+        image_url = tag.img.get('src')
+        image_name = image_url.split('/')[-1]
+        urlretrieve(image_url, './output/img/' + image_name)
 
         with open('cars_info.json', 'a+', encoding='utf8') as f:
             f.write(json.dumps(
