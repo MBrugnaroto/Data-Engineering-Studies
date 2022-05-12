@@ -5,8 +5,12 @@ web-scraping-env
 *.json
 .history/
 *.vsix
+*.rar
+*.csv
 output/
 web/
+beamenv
+__pycache__
 
 !.vscode/settings.json
 !.vscode/tasks.json
