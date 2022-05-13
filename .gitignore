@@ -18,6 +18,6 @@ __pycache__
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
-!apahce-beam/raw-data/sample_casos_dengue.
+!apache-beam/raw-data/sample_casos_dengue.txt
 !apache-beam/raw-data/sample_chuvas.csv
 !apache-beam/processed-data/result-00000-of-00001.csv
