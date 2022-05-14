@@ -8,6 +8,7 @@ web-scraping-env
 *.rar
 *.csv
 *.txt
+.ipynb_checkpoints/
 output/
 web/
 apache-spark/raw-data/
