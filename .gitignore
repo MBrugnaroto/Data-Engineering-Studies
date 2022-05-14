@@ -11,6 +11,7 @@ web-scraping-env
 output/
 web/
 beamenv
+engenv
 __pycache__
 
 !.vscode/settings.json
