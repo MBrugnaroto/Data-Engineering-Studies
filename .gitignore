@@ -10,6 +10,7 @@ web-scraping-env
 *.txt
 output/
 web/
+apache-spark/raw-data/
 beamenv
 engenv
 __pycache__
