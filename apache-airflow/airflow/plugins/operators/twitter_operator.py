@@ -1,8 +1,5 @@
 import json
-from os.path import join
 from pathlib import Path
-from datetime import datetime
-from airflow.models import DAG, TaskInstance
 from airflow.models.baseoperator import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from hooks.twitter_hook import TwitterHook

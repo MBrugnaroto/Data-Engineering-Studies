@@ -39,7 +39,6 @@ def get_tweets_data(df):
 def define_dest_path(datalake_path):
     return  join(
                 datalake_path,
-                "silver",
                 "{table_name}",
                 "process_date={process_date}"
             )
