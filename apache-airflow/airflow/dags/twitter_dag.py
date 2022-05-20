@@ -1,3 +1,4 @@
+from pathlib import Path
 from os.path import join
 from airflow.models import DAG
 from airflow.operators.alura import TwitterOperator
@@ -9,10 +10,15 @@ ARGS = {
     "depends_on_past": False,
     "start_date": days_ago(6)
 }
-
-BASE_FOLDER_ALURA = join()
-
+SOURCE_FOLDER=str(Path(__file__).parents[2])
+PARTITION_FODER = "extract_date={{ ds }}"
 TIMESTEMP_FORMAT = '%Y-%m-%dT%H:%M:%S.00Z'
+DATA_LAKE_ALURA = join(
+            SOURCE_FOLDER,
+            "datalake",
+            "{layer}",
+            "{table}",
+            "{partition}")
 
 with DAG(
     dag_id="twitter_dag", 
@@ -24,10 +30,9 @@ with DAG(
         task_id="twitter_extractor_aluraonline",
         query="AluraOnline",
         file_path=join(
-            "/home/mbrugnar/workspace/data-engineering-studies/apache-airflow/datalake",
-            "bronze",
-            "aluraonline"
-            "extract_date={{ ds }}",
+            DATA_LAKE_ALURA.format(layer='bronze', 
+                                   table='aluraonline', 
+                                   partition=PARTITION_FODER),
             "extraction_{{ ds_nodash }}.json"
         ),
         start_time=("{{"
@@ -40,16 +45,19 @@ with DAG(
     
     spark_operator = SparkSubmitOperator(
         task_id="twitte_transformation_aluraonline",
-        application=("/home/mbrugnar/workspace/data-engineering-studies/"
-                    "apache-airflow/spark/transformation.py"),
+        application=join(
+                    SOURCE_FOLDER,
+                    "spark/transformation.py"),
         name="twitte_transformation",
         application_args=[
             "--src",
-            "/home/mbrugnar/workspace/data-engineering-studies/"
-            "apache-airflow/datalake/bronze/aluraonline/extract_date=2022-05-17",
+            DATA_LAKE_ALURA.format(layer='bronze', 
+                                   table='aluraonline', 
+                                   partition=PARTITION_FODER),
             "--dest",
-            "/home/mbrugnar/workspace/data-engineering-studies/"
-            "apache-airflow/datalake/silver/aluraonline",
+            DATA_LAKE_ALURA.format(layer='silver', 
+                                   table='aluraonline', 
+                                   partition=""),
             "--process-date",
             "{{ ds }}"
         ]

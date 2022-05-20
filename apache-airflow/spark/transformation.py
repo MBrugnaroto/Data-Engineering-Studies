@@ -1,20 +1,6 @@
 from os.path import join
+import modules_spark as ModulesSpark
 import argparse
-
-import findspark
-findspark.init()
-from pyspark.sql import functions as f
-from pyspark.sql import SparkSession
-
-
-def create_spark_session():
-    return SparkSession\
-                    .builder\
-                    .appName("twitter_transformation")\
-                    .getOrCreate()
-
-def read_extracts(spark, path):
-    return spark.read.json(path)
                     
 def get_users_data(df):
     return df\
@@ -51,8 +37,8 @@ def data_transformed_export(df, dest):
         .json(dest)
 
 def twitter_transform(src, dest, process_date):
-    spark = create_spark_session()
-    df = read_extracts(spark, src)
+    spark = ModulesSpark.create_spark_session()
+    df = ModulesSpark.read_extracts(spark, src)
     
     users_df = get_users_data(df)
     tweets_df = get_tweets_data(df)
