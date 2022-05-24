@@ -12,9 +12,9 @@ mysql -u root <<EOF
                	DECLARE vClient VARCHAR(11);
     		DECLARE vPosition INT DEFAULT 0;
     		DECLARE vMax INT DEFAULT 0;
-    		SELECT COUNT(*) INTO vMax FROM TABELA_DE_CLIENTES;
-    		SET vPosition = FRANDNUM(1, vMax)-1;
-		SELECT CPF INTO vClient FROM TABELA_DE_CLIENTES LIMIT vPosition, 1;
+    		SELECT COUNT(*) INTO vMax FROM tabela_de_clientes;
+    		SET vPosition = FN_RAND_NUM(1, vMax)-1;
+		SELECT CPF INTO vClient FROM tabela_de_clientes LIMIT vPosition, 1;
 		RETURN vClient;
 	END &&
         DELIMITER ;
