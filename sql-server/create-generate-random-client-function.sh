@@ -1,0 +1,27 @@
+#!/bin/bash
+
+mysql -u root <<EOF
+        USE DB_TEST;
+        SET GLOBAL log_bin_trust_function_creators = 1;
+        DROP FUNCTION IF EXISTS FN_RAND_CLIENT;
+
+        DELIMITER &&
+        CREATE FUNCTION FN_RAND_CLIENT()
+        RETURNS VARCHAR(11)
+        BEGIN
+               	DECLARE vClient VARCHAR(11);
+    		DECLARE vPosition INT DEFAULT 0;
+    		DECLARE vMax INT DEFAULT 0;
+    		SELECT COUNT(*) INTO vMax FROM TABELA_DE_CLIENTES;
+    		SET vPosition = FRANDNUM(1, vMax)-1;
+		SELECT CPF INTO vClient FROM TABELA_DE_CLIENTES LIMIT vPosition, 1;
+		RETURN vClient;
+	END &&
+        DELIMITER ;
+EOF
+if [ $? -eq 0 ]
+then
+        echo 'Creation of function in' $db 'database was successfull.'
+else
+        echo 'Creation of function in' $db 'database was not performed.'
+fi
