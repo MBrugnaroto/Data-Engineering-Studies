@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mysql -u root <<EOF
-        USE DB_TEST;
+        USE $1;
         SET GLOBAL log_bin_trust_function_creators = 1;
         DROP FUNCTION IF EXISTS FN_RAND_PRODUCT;
 
@@ -21,7 +21,7 @@ mysql -u root <<EOF
 EOF
 if [ $? -eq 0 ]
 then
-        echo 'Creation of function in DB_TEST database was successfull.'
+        echo 'Creation of function in' $1 'database was successfull.'
 else
-        echo 'Creation of function in DB_TEST database was not performed.'
+        echo 'Creation of function in' $1 'database was not performed.'
 fi

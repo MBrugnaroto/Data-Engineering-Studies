@@ -25,6 +25,3 @@ then
 else
         echo "Dump folder not found."
 fi
-
-
-

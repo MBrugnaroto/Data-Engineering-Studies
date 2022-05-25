@@ -17,7 +17,7 @@ mysql -u root <<EOF
 EOF
 if [ $? -eq 0 ]
 then
-        echo 'Creation of procedure in ' $db ' database was successfull.'
+        echo 'Creation of procedure in' $db 'database was successfull.'
 else
-        echo 'Creation of procedure in ' $db ' database was not performed.'
+        echo 'Creation of procedure in' $db 'database was not performed.'
 fi
