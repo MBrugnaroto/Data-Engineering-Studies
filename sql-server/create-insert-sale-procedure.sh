@@ -5,7 +5,7 @@ mysql -u root <<EOF
         DROP PROCEDURE IF EXISTS PR_INSERT_SALE;
 
         DELIMITER &&
-        CREATE PROCEDURE PR_INSERT_SALE(vDate DATE, vMaxNotes INT, vMaxItens INT, vMaxQuantity INT)
+        CREATE PROCEDURE PR_INSERT_SALE(vDate DATE, vMaxNotes INT, vMaxItens INT, vMaxQuantity INT, vCommitValue INT)
         BEGIN
                 DECLARE vClient VARCHAR(11);
                 DECLARE vSaller VARCHAR(5);
@@ -15,6 +15,10 @@ mysql -u root <<EOF
                 DECLARE vQuantity INT;
                 DECLARE vProduct VARCHAR(10);
                 DECLARE vProductPrice FLOAT;
+                DECLARE vCommit INT DEFAULT 0;
+                DECLARE vNotesValues LONGTEXT DEFAULT '';
+                DECLARE vItensValues LONGTEXT DEFAULT '';
+                DECLARE vTotalTime FLOAT DEFAULT 0.0;
 
                 SELECT MAX(NUMERO) INTO vNumNote FROM notas_fiscais;
                 SELECT AVG(IMPOSTO) INTO vTax FROM notas_fiscais;
@@ -27,45 +31,74 @@ mysql -u root <<EOF
                         SET vSaller = FN_RAND_SELLER();
                         SET vNumNote = vNumNote + 1;
                         SET vCountItens = 0;
-                        
-                        SET @insertNotesQuery = CONCAT(@insertNotesQuery, '(', '"',vClient,'"', ',', '"', vSaller, '"', ',', '"', vDate, '"', ',', vNumNote, ',', vTax, ')|');
+                        SET vNotesValues = CONCAT(vNotesValues, '(', '"',vClient,'"', ',', '"', vSaller, '"', ',', '"', vDate, '"', ',', vNumNote, ',', vTax, ')|');
                         
                         WHILE vCountItens < vMaxItens
                         DO
                                 SET vQuantity = FN_RAND_NUM(1, vMaxQuantity);
                                 SET vProduct = FN_RAND_PRODUCT();
                                 SELECT COUNT(*) INTO @vValid FROM itens_notas_fiscais WHERE NUMERO = vNumNote AND CODIGO_DO_PRODUTO = vProduct;
-                                SELECT COUNT(*) INTO @vValidQuery FROM (SELECT @insertItensQuery AS COMPARE) AS AUX where COMPARE LIKE (CONCAT('%',vNumNote, ',', vProduct, '%'));
+                                SELECT COUNT(*) INTO @vValidQuery FROM (SELECT vItensValues AS COMPARE) AS AUX where COMPARE LIKE (CONCAT('%',vNumNote, ',', vProduct, '%'));
 
                                 IF @vValid = 0 AND @vValidQuery = 0 THEN
                                         SELECT PRECO_DE_LISTA INTO vProductPrice FROM tabela_de_produtos WHERE CODIGO_DO_PRODUTO = vProduct;
-                                        SET @insertItensQuery = CONCAT(@insertItensQuery, '(', vNumNote, ',', vProduct, ',', vQuantity, ',', vProductPrice, ')|');
+                                        SET vItensValues = CONCAT(vItensValues, '(', vNumNote, ',', vProduct, ',', vQuantity, ',', vProductPrice, ')|');
                                 END IF;
-
                                 SET vCountItens = vCountItens+1;
+                                SET vCommit = vCommit+1;
+                                SELECT LENGTH(vItensValues) INTO @totalItens;
+
+                                IF vCommitValue = vCommit AND @totalItens > 0
+                                THEN
+                                        SELECT FN_HANDLE_QUERY(vNotesValues) INTO @treatedNotesQuery;
+                                        SELECT FN_HANDLE_QUERY(vItensValues) INTO @treatedItensQuery;
+                                        
+                                        SELECT CURTIME(6) INTO @start;
+                                        CALL PR_QUERY_EXECUTOR(CONCAT(@insertNotesQuery, @treatedNotesQuery));
+                                        CALL PR_QUERY_EXECUTOR(CONCAT(@insertItensQuery, @treatedItensQuery));
+                                        SELECT CURTIME(6) INTO @end;
+                                        SELECT TIME_TO_SEC(TIMEDIFF(@end, @start)) INTO @diffTime;
+                                        SET vTotalTime = vTotalTime + @diffTime;
+                                        SET vNotesValues = ''; 
+                                        SET vItensValues = ''; 
+                                        SET vCommit = 0;
+                                END IF;
                         END WHILE;
                         SET vCountNotes = vCountNotes+1;
                 END WHILE;
+                
+                SELECT LENGTH(vNotesValues) INTO @totalNotes;
+                SELECT LENGTH(vItensValues) INTO @totalItens;
+                
+                IF @totalNotes > 0 
+                THEN
+                        SELECT FN_HANDLE_QUERY(vNotesValues) INTO @treatedNotesQuery;
 
-                SET @insertNotesQuery = REPLACE(@insertNotesQuery, ')|(', '),(');
-                SET @insertNotesQuery = REPLACE(@insertNotesQuery, '|', ';');
+                        SELECT CURTIME(6) INTO @start;
+                        CALL PR_QUERY_EXECUTOR(CONCAT(@insertNotesQuery, @treatedNotesQuery));
+                        SELECT CURTIME(6) INTO @end;
+                        SELECT TIME_TO_SEC(TIMEDIFF(@end, @start)) INTO @diffTime;
+                        SET vTotalTime = vTotalTime + @diffTime;
+                END IF;
 
-                Prepare stmt FROM @insertNotesQuery;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
+                IF @totalItens > 0
+                THEN
+                        SELECT FN_HANDLE_QUERY(vItensValues) INTO @treatedItensQuery;
 
-                SET @insertItensQuery = REPLACE(@insertItensQuery, ')|(', '),(');
-                SET @insertItensQuery = REPLACE(@insertItensQuery, '|', ';');
+                        SELECT CURTIME(6) INTO @start;
+                        CALL PR_QUERY_EXECUTOR(CONCAT(@insertItensQuery, @treatedItensQuery));
+                        SELECT CURTIME(6) INTO @end;
+                        SELECT TIME_TO_SEC(TIMEDIFF(@end, @start)) INTO @diffTime;
+                        SET vTotalTime = vTotalTime + @diffTime;
+                END IF;
 
-                PREPARE stmt FROM @insertItensQuery;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
+                SELECT vTotalTime AS 'TOTAL_TIME_INSERT';
         END &&
         DELIMITER ;
 EOF
 if [ $? -eq 0 ]
 then
-        echo 'Creation of function in' $db 'database was successfull.'
+        echo 'Creation of procedure in DB_TEST database was successfull.'
 else
-        echo 'Creation of function in' $db 'database was not performed.'
+        echo 'Creation of procedure in DB_TEST database was not performed.'
 fi

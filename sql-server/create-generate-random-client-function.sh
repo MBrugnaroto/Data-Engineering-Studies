@@ -21,7 +21,7 @@ mysql -u root <<EOF
 EOF
 if [ $? -eq 0 ]
 then
-        echo 'Creation of function in' $db 'database was successfull.'
+        echo 'Creation of function in DB_TEST database was successfull.'
 else
-        echo 'Creation of function in' $db 'database was not performed.'
+        echo 'Creation of function in DB_TEST database was not performed.'
 fi
