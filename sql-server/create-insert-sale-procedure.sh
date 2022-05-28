@@ -98,7 +98,7 @@ mysql -u root <<EOF
 EOF
 if [ $? -eq 0 ]
 then
-        echo 'Creation of procedure in' $1 'database was successfull.'
+        echo 'Creation of Insert Rand Sale Procedure in' $1 'database was successfull.'
 else
-        echo 'Creation of procedure in' $1 'database was not performed.'
+        echo 'Creation of Insert Rand Sale Procedure in' $1 'database was not performed.'
 fi

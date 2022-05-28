@@ -6,18 +6,19 @@ mysql -u root <<EOF
         USE $db;
         DROP PROCEDURE IF EXISTS PR_QUERY_EXECUTOR;
 
-        DELIMITER $$
+        DELIMITER &&
         CREATE PROCEDURE PR_QUERY_EXECUTOR(QUERY LONGTEXT)
         BEGIN
             PREPARE SMT FROM QUERY;
             EXECUTE SMT;
             DEALLOCATE PREPARE SMT;
-        END $$
+        END &&
         DELIMITER ;
 EOF
 if [ $? -eq 0 ]
 then
-        echo 'Creation of procedure in' $db 'database was successfull.'
+        echo 'Creation of Query Executor Procedure in' $db 'database was successfull.'
 else
-        echo 'Creation of procedure in' $db 'database was not performed.'
+        echo 'Creation of Query Executor Procedure in' $db 'database was not performed.'
 fi
+done

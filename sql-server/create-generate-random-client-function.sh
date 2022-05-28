@@ -21,7 +21,7 @@ mysql -u root <<EOF
 EOF
 if [ $? -eq 0 ]
 then
-        echo 'Creation of function in' $1 'database was successfull.'
+        echo 'Creation of Rand Client Function in' $1 'db was successfull.'
 else
-        echo 'Creation of function in' $1 'database was not performed.'
+        echo 'Creation of Rand Client Function in' $1 'db was not performed.'
 fi
