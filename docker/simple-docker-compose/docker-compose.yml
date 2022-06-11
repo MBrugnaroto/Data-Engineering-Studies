@@ -1,0 +1,26 @@
+services:
+  meu-mongo:
+    image: mongo:4.4.6
+    volumes: 
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+    networks:
+      - my-bridge
+  books-app:
+    image: aluradocker/alura-books:1.0
+    ports:
+      - 3000:3000
+    networks:
+      - my-bridge
+    depends_on:
+      - meu-mongo
+networks:
+  my-bridge:
+    driver: bridge
+    # external: true
+volumes:
+  mongo-data:
+    # external: true
+  mongo-config:
+    # external: true
+    
