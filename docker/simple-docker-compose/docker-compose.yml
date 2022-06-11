@@ -1,6 +1,7 @@
 services:
-  meu-mongo:
+  mongodb:
     image: mongo:4.4.6
+    container_name: meu-mongo
     volumes: 
       - mongo-data:/data/db
       - mongo-config:/data/configdb
@@ -8,6 +9,7 @@ services:
       - my-bridge
   books-app:
     image: aluradocker/alura-books:1.0
+    container_name: alurabooks
     ports:
       - 3000:3000
     networks:
