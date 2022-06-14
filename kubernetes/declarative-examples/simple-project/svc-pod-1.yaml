@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-pod-1-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: pod-1-label
+  ports:
+    - name: svc-1-port
+      port: 3000
+      targetPort: 80
