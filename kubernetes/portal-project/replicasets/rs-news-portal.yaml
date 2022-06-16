@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rs-news-portal
+spec:
+  template:
+    metadata:
+      name: news-portal
+      labels:
+        app: news-portal
+    spec:
+      containers:
+        - name: news-portal-container
+          image: aluracursos/portal-noticias:1
+          ports:
+            - containerPort: 80
+          env:
+            - name: "IP_SISTEMA"
+              value: "http://localhost:30001"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: news-portal
