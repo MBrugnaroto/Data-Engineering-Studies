@@ -22,13 +22,27 @@ spec:
               mountPath: /var/www/html/uploads
             - name: sessions
               mountPath: /temp
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 3
+            initialDelaySeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 5
+            initialDelaySeconds: 3
       volumes:
         - name: images
           persistentVolumeClaim:
             claimName: pvc-image 
         - name: sessions
           persistentVolumeClaim:
-            claimName: pvc-session 
+            claimName: pvc-session
   replicas: 1
   selector:
     matchLabels:
