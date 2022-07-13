@@ -1,1 +1,1 @@
-# Data Engineering Studies
+# DevOps Studies
