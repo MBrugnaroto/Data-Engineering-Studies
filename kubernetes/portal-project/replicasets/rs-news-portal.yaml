@@ -17,23 +17,6 @@ spec:
           env:
             - name: "IP_SISTEMA"
               value: "http://localhost:30001"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            periodSeconds: 10
-            failureThreshold: 3
-            initialDelaySeconds: 20
-          readinessProbe:
-            httpGet:
-              path: /inserir_noticias.php
-              port: 80
-            periodSeconds: 10
-            failureThreshold: 5
-            initialDelaySeconds: 3
-          resources:
-            requests:
-              cpu: 10m
   replicas: 3
   selector:
     matchLabels:
